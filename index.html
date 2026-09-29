@@ -2263,6 +2263,8 @@
       // number") instead of asking for one.
       const CONTACT_CONFIRMATION_RE =
         /\b(saved|noted|recorded|already have|on file|got it)\b/i;
+      const FRAUD_ALERT_CHANNEL_QUESTION_RE =
+        /\bfraud alert\b[\s\S]*\btransaction\b[\s\S]*\b(phone call|text message|email)\b/i;
 
       const CONTACT_FIELD_PATTERNS = [
         {
@@ -2293,7 +2295,11 @@
 
       function detectRequestedContactFields(text) {
         if (CONTACT_CONFIRMATION_RE.test(text)) return [];
-        return CONTACT_FIELD_PATTERNS.filter((f) => f.re.test(text));
+        return CONTACT_FIELD_PATTERNS.filter(
+          (f) =>
+            f.re.test(text) &&
+            !(f.key === "email" && FRAUD_ALERT_CHANNEL_QUESTION_RE.test(text)),
+        );
       }
 
       // Inline form rendered under an assistant message that asked for one
